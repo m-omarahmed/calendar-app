@@ -1,23 +1,20 @@
 package de.calendar.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Random;
+import java.util.Objects;
 
-public class CalendarModel {
-
+public class CalendarModel implements Serializable {
+  private static final long serialVersionUID = 1905122041950251207L;
   private int id;
   private String appointment;
-//  private LocalDateTime dateTime;
   private String dateTime;
   private boolean reminder;
 
   public CalendarModel(String appointment, String dateTime, boolean reminder) {
-//    this.id = new Random().nextInt(100);
     this.appointment = appointment;
     this.dateTime = dateTime;
     this.reminder = reminder;
-
-//    dateTime = LocalDateTime.now();
   }
 
   public int getId() {
@@ -36,13 +33,13 @@ public class CalendarModel {
     this.appointment = appointment;
   }
 
-//  public LocalDateTime getDateTime() {
-//    return dateTime;
-//  }
-//
-//  public void setDateTime(LocalDateTime dateTime) {
-//    this.dateTime = dateTime;
-//  }
+  public String getDateTime() {
+    return dateTime;
+  }
+
+  public void setDateTime(String dateTime) {
+    this.dateTime = dateTime;
+  }
 
   public boolean isReminder() {
     return reminder;
@@ -53,11 +50,25 @@ public class CalendarModel {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof CalendarModel)) return false;
+    CalendarModel that = (CalendarModel) o;
+    return id == that.id && reminder == that.reminder
+        && appointment.equals(that.appointment) && dateTime.equals(that.dateTime);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, appointment, dateTime, reminder);
+  }
+
+  @Override
   public String toString() {
     return "[" +
         "id: " + id +
         ", appointment: " + appointment +
-        ", dateTime: " + dateTime  +
+        ", dateTime: " + dateTime +
         ", reminder: " + reminder +
         ']';
   }

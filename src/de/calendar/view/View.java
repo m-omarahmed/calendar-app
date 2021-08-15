@@ -5,17 +5,15 @@ import de.calendar.model.CalendarModel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
-public class View implements PropertyChangeListener {
-
+public class View implements PropertyChangeListener, Serializable {
+  private static final long serialVersionUID = 10000000000L;
   private final JLabel appointmentLabel;
   private final JLabel appointmentDateLabel;
   private final JTextField appointmentField;
@@ -25,15 +23,14 @@ public class View implements PropertyChangeListener {
   private final JCheckBox reminder;
   private final JButton save;
   private final JButton show;
-  private final JTextArea console = new JTextArea(3,3);
-  private DefaultTableModel tableModel;
-  private Object[][] data;
+  private final CalendarTableModel tableModel;
   private JTable table;
 
   private final Controller controller;
 
   public View(Controller controller) {
     this.controller = controller;
+    tableModel = new CalendarTableModel(new ArrayList<>(), controller);
 
     var appFrame = new JFrame("Calendar");
     appPanel = new JPanel();
@@ -55,7 +52,6 @@ public class View implements PropertyChangeListener {
     reminder.setBackground(appPanel.getBackground());
 
     buildAppointment();
-    listenReminder();
     saveAppointment();
     showAppointments();
 
@@ -64,7 +60,6 @@ public class View implements PropertyChangeListener {
 
     appPanel.add(save);
     appPanel.add(show);
-    data = new Object[0][4];
     createTable();
 
     appFrame.setVisible(true);
@@ -75,14 +70,7 @@ public class View implements PropertyChangeListener {
   }
 
   private void showAppointments() {
-    show.addActionListener(e -> {
-//      if (console.isVisible()) {
-//        show.setText("Show");
-//        console.setVisible(false);
-//      }else {
-        controller.showAppointments();
-//      }
-    });
+    show.addActionListener(e -> controller.showAppointments());
   }
 
   private void saveAppointment() {
@@ -93,21 +81,6 @@ public class View implements PropertyChangeListener {
             new CalendarModel(appointmentField.getText(),
                 appointmentDate.getText(), reminder.isSelected())
         );
-      }
-    });
-  }
-
-  private void listenReminder() {
-    reminder.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-//        controller.changeReminder(
-//            new CalendarModel(appointmentField.getText(),
-//            appointmentDate.getText(), reminder.isSelected())
-//            );
-
-        controller.changeReminder(reminder.isSelected());
-        System.err.println("Hello");
       }
     });
   }
@@ -132,64 +105,17 @@ public class View implements PropertyChangeListener {
   }
 
   private void createTable() {
-
-    tableModel = getTableModelInstance();
     table = new JTable(tableModel);
     var scrollPane=new JScrollPane(table);
     scrollPane.setBounds(20,250 , 515,150);
     table.setBounds(20,250 , 515,150);
-    table.getSelectionModel().addListSelectionListener(evt -> {
-      System.out.println(table.getValueAt(table.getSelectedRow(), 0).toString());
-    });
-
     table.setPreferredScrollableViewportSize(new Dimension(515, 150));
+    alignColumns();
 
     scrollPane.setVerticalScrollBarPolicy ( ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED );
     scrollPane.setHorizontalScrollBarPolicy( ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED );
     appPanel.add(scrollPane);
-
   }
-
-  private DefaultTableModel getTableModelInstance() {
-
-    String[] column ={"ID","Appointment","Date","Reminder"};
-    return new DefaultTableModel( data, column) {
-      @Override
-      public int getRowCount() {
-        return data.length;
-      }
-
-      @Override
-      public int getColumnCount() {
-        return column.length;
-      }
-
-      @Override
-      public Object getValueAt(int rowIndex, int columnIndex) {
-        return data[rowIndex][columnIndex];
-      }
-      @Override
-      public Class<?> getColumnClass(int c) {
-        return getValueAt(0, c).getClass();
-      }
-      @Override
-      public boolean isCellEditable(int row, int col) {
-        return col >= 2;
-      }
-
-      @Override
-      public void setValueAt(Object value, int row, int col) {
-        data[row][col] = value;
-        fireTableCellUpdated(row, col);
-      }
-
-      public void sample() {
-        var length = data.length;
-      }
-
-    };
-  }
-
 
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
@@ -201,29 +127,11 @@ public class View implements PropertyChangeListener {
       reminder.setSelected(false);
     }else if (evt.getPropertyName().equals("show")){
       List<CalendarModel> appointments = (List<CalendarModel>) evt.getNewValue();
-      data = convertToRows(appointments);
-      tableModel.setDataVector(data, new Object[]{"ID","Appointment","Date","Reminder"});
-      alignColumns();
-      console.setText("");
-//      appointments.forEach(model -> console.append(model.toString()+"\n"));
-//      console.setVisible(true);
-//      show.setText("Close");
+      tableModel.setCalendarModels(appointments);
     }else {
+      System.err.println("Old value: "+evt.getOldValue());
       System.err.println("New value: "+evt.getNewValue());
     }
-
-  }
-
-  private  Object[][] convertToRows(List<CalendarModel> modelList) {
-    Object[][] data = new Object[modelList.size()][4] ;
-    for (var i=0; i < data.length; i++) {
-      var model = modelList.get(i);
-      data[i] = new Object[] {
-          model.getId(), model.getAppointment(), model.getAppointment(), model.isReminder()
-      };
-    }
-
-    return data;
   }
 
   private void alignColumns() {
