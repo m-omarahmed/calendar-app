@@ -133,9 +133,7 @@ public class View implements PropertyChangeListener {
 
   private void createTable() {
 
-     tableModel = getTableModelInstance();
-     tableModel.s
-
+    tableModel = getTableModelInstance();
     table = new JTable(tableModel);
     var scrollPane=new JScrollPane(table);
     scrollPane.setBounds(20,250 , 515,150);
