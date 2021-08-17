@@ -22,7 +22,6 @@ public class View implements PropertyChangeListener, Serializable {
   private final JLabel reminderLabel;
   private final JCheckBox reminder;
   private final JButton save;
-  private final JButton show;
   private final CalendarTableModel tableModel;
   private JTable table;
 
@@ -40,38 +39,26 @@ public class View implements PropertyChangeListener, Serializable {
     appointmentField = new JFormattedTextField();
     appointmentDate = new JFormattedTextField();
     reminder = new JCheckBox();
-
     save = new JButton("Save");
-    show = new JButton("Show");
 
     appFrame.setContentPane(appPanel);
-    appPanel.setBorder(new EmptyBorder(5,5,5,5));
-    appPanel.setPreferredSize(new Dimension(550,480));
-    appPanel.setLayout(null);
     appPanel.setBackground(new Color(255,230,0));
     reminder.setBackground(appPanel.getBackground());
 
-    buildAppointment();
+    alignComponents();
     saveAppointment();
-    showAppointments();
 
-    save.setBounds(180,190 , 75,30);
-    show.setBounds(405,190 , 75,30);
 
-    appPanel.add(save);
-    appPanel.add(show);
     createTable();
 
     appFrame.setVisible(true);
     appFrame.pack();
-    appFrame.setMinimumSize(new Dimension(appPanel.getWidth()+20,
-        appPanel.getHeight()+20));
+    appFrame.setMinimumSize(
+        new Dimension(appPanel.getWidth()+20, appPanel.getHeight()+20));
     appFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    appFrame.setLocationRelativeTo(null);
   }
 
-  private void showAppointments() {
-    show.addActionListener(e -> controller.showAppointments());
-  }
 
   private void saveAppointment() {
     save.addActionListener(e -> {
@@ -85,10 +72,13 @@ public class View implements PropertyChangeListener, Serializable {
     });
   }
 
-  private void buildAppointment() {
+  private void alignComponents() {
+    appPanel.setBorder(new EmptyBorder(5,5,5,5));
+    appPanel.setPreferredSize(new Dimension(550,480));
+    appPanel.setLayout(null);
+
     appointmentLabel.setBounds(20,70 , 150,30);
     appointmentField.setBounds(180,70 , 300,30);
-//    appointmentField.setBounds(180,70 , 350,30);
 
     appointmentDateLabel.setBounds(20,110 , 150,30);
     appointmentDate.setBounds(180,110 , 300,30);
@@ -96,12 +86,16 @@ public class View implements PropertyChangeListener, Serializable {
     reminderLabel.setBounds(20,150 , 150,30);
     reminder.setBounds(176,150 , 300,30);
 
+    save.setBounds(180,190 , 300,30);
+
+
     appPanel.add(appointmentLabel);
     appPanel.add(appointmentField);
     appPanel.add(appointmentDateLabel);
     appPanel.add(appointmentDate);
     appPanel.add(reminderLabel);
     appPanel.add(reminder);
+    appPanel.add(save);
   }
 
   private void createTable() {
@@ -120,14 +114,15 @@ public class View implements PropertyChangeListener, Serializable {
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
     if (evt.getPropertyName().equals("new")) {
-//      JOptionPane.showMessageDialog(null, "Appointment was saved");
-      System.err.println("Appointment was saved");
+      JOptionPane.showMessageDialog(null, "Appointment was saved");
+//      System.err.println("Appointment was saved");
       appointmentField.setText("");
       appointmentDate.setText("");
       reminder.setSelected(false);
-    }else if (evt.getPropertyName().equals("show")){
+      controller.loadAppointments();
+    }else if (evt.getPropertyName().equals("load")){
       List<CalendarModel> appointments = (List<CalendarModel>) evt.getNewValue();
-      tableModel.setCalendarModels(appointments);
+      tableModel.rebuild(appointments);
     }else {
       System.err.println("Old value: "+evt.getOldValue());
       System.err.println("New value: "+evt.getNewValue());

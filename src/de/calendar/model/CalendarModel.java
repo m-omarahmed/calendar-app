@@ -1,7 +1,6 @@
 package de.calendar.model;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class CalendarModel implements Serializable {
@@ -66,10 +65,10 @@ public class CalendarModel implements Serializable {
   @Override
   public String toString() {
     return "[" +
-        "id: " + id +
-        ", appointment: " + appointment +
-        ", dateTime: " + dateTime +
-        ", reminder: " + reminder +
+        "ID: " + id +
+        ", Appointment: " + appointment +
+        ", Date & Time: " + dateTime +
+        ", Reminder: " + reminder +
         ']';
   }
 }

@@ -4,23 +4,21 @@ import de.calendar.controller.Controller;
 import de.calendar.model.CalendarModel;
 
 import javax.swing.table.AbstractTableModel;
-import java.io.Serializable;
 import java.util.List;
 
-public class CalendarTableModel extends AbstractTableModel implements Serializable {
-  private static final long serialVersionUID = 2405172041950251807L;
-  private final String[] columnsNames = {"ID", "Appointment", "Date&Time", "Reminder"};
+public class CalendarTableModel extends AbstractTableModel {
+  private final String[] columnsNames = {"ID", "Appointment", "Date & Time", "Reminder"};
   private final Controller controller;
-  private List<CalendarModel> calendarModels;
+  private List<CalendarModel> appointments;
 
-  public CalendarTableModel(List<CalendarModel> calendarModels, Controller controller) {
-    this.calendarModels = calendarModels;
+  public CalendarTableModel(List<CalendarModel> appointments, Controller controller) {
+    this.appointments = appointments;
     this.controller = controller;
   }
 
   @Override
   public int getRowCount() {
-    return calendarModels.size();
+    return appointments.size();
   }
 
   @Override
@@ -35,7 +33,7 @@ public class CalendarTableModel extends AbstractTableModel implements Serializab
 
   @Override
   public Object getValueAt(int row, int column) {
-    var calenderModel = calendarModels.get(row);
+    var calenderModel = appointments.get(row);
     switch (column) {
       case 0:
         return calenderModel.getId();
@@ -66,28 +64,28 @@ public class CalendarTableModel extends AbstractTableModel implements Serializab
     CalendarModel oldModel = clone(row);
     switch (col) {
       case 1:
-        calendarModels.get(row).setAppointment((String) value);
+        appointments.get(row).setAppointment((String) value);
         break;
       case 2:
-        calendarModels.get(row).setDateTime((String) value);
+        appointments.get(row).setDateTime((String) value);
         break;
       case 3:
-        calendarModels.get(row).setReminder((Boolean) value);
+        appointments.get(row).setReminder((Boolean) value);
         break;
       default:
         break;
     }
-    controller.changeAppointment(oldModel, row);
+    controller.editAppointment(oldModel, row);
   }
 
-  public void setCalendarModels(List<CalendarModel> calendarModels) {
-    this.calendarModels = calendarModels;
+  public void rebuild(List<CalendarModel> calendarModels) {
+    this.appointments = calendarModels;
     fireTableDataChanged();
   }
 
   private CalendarModel clone(int row) {
-    var cm = calendarModels.get(row);
-    CalendarModel toReturnModel = new CalendarModel( cm.getAppointment(), cm.getDateTime(), cm.isReminder());
+    var cm = appointments.get(row);
+    var toReturnModel = new CalendarModel(cm.getAppointment(), cm.getDateTime(), cm.isReminder());
     toReturnModel.setId(cm.getId());
 
     return toReturnModel ;
