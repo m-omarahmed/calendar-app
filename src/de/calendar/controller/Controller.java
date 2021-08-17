@@ -16,7 +16,7 @@ public class Controller implements AppCalendar, Serializable {
 
   public Controller() {
     var myView = new View(this);
-    this.propertyChangeSupport  = new PropertyChangeSupport(myView);
+    this.propertyChangeSupport  = new PropertyChangeSupport(this);
 
     propertyChangeSupport.addPropertyChangeListener("edit", myView);
     propertyChangeSupport.addPropertyChangeListener("new", myView);
