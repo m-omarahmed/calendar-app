@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+// PropertyChangeListener impelementieren um Änderungen von View ueberwacht zu werden
 public class View implements PropertyChangeListener, Serializable {
   private static final long serialVersionUID = 10000000000L;
   private final JLabel appointmentLabel;
@@ -26,7 +27,7 @@ public class View implements PropertyChangeListener, Serializable {
   private JTable table;
 
   private final Controller controller;
-
+  // GUI Komponenten initializieren
   public View(Controller controller) {
     this.controller = controller;
     tableModel = new CalendarTableModel(new ArrayList<>(), controller);
@@ -59,7 +60,7 @@ public class View implements PropertyChangeListener, Serializable {
     appFrame.setLocationRelativeTo(null);
   }
 
-
+  // Termin speichen
   private void saveAppointment() {
     save.addActionListener(e -> {
       if (!appointmentField.getText().equals("")
@@ -71,7 +72,7 @@ public class View implements PropertyChangeListener, Serializable {
       }
     });
   }
-
+  // Komponenten anpassen
   private void alignComponents() {
     appPanel.setBorder(new EmptyBorder(5,5,5,5));
     appPanel.setPreferredSize(new Dimension(550,480));
@@ -97,7 +98,7 @@ public class View implements PropertyChangeListener, Serializable {
     appPanel.add(reminder);
     appPanel.add(save);
   }
-
+  // Table erzeugen
   private void createTable() {
     table = new JTable(tableModel);
     var scrollPane=new JScrollPane(table);
@@ -110,12 +111,11 @@ public class View implements PropertyChangeListener, Serializable {
     scrollPane.setHorizontalScrollBarPolicy( ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED );
     appPanel.add(scrollPane);
   }
-
+// die aus PropertyChangeListener Methode implementieren
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
     if (evt.getPropertyName().equals("new")) {
       JOptionPane.showMessageDialog(null, "Appointment was saved");
-//      System.err.println("Appointment was saved");
       appointmentField.setText("");
       appointmentDate.setText("");
       reminder.setSelected(false);
@@ -128,7 +128,7 @@ public class View implements PropertyChangeListener, Serializable {
       System.err.println("New value: "+evt.getNewValue());
     }
   }
-
+  // Spalten anpassen
   private void alignColumns() {
     table.setAutoCreateColumnsFromModel(false);
     table.getColumnModel().getColumn(0).setPreferredWidth(10);

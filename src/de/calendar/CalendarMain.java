@@ -6,6 +6,7 @@ import javax.swing.*;
 
 public class CalendarMain {
   public static void main(String[] args) {
+    // GUI Thread verwenden
     SwingUtilities.invokeLater(Controller::new);
   }
 }
